@@ -1,0 +1,33 @@
+{
+  "name": "geo-agent",
+  "version": "0.0.1",
+  "description": "White-hat GEO (Generative Engine Optimization) agent. Mines prompt-shaped FAQs from your own support channels, probes major AI assistants for citation telemetry, and completes the sameAs entity graph. Agents draft, humans sign. Zero runtime dependencies. Sibling to agent-seo.",
+  "keywords": ["geo", "generative-engine-optimization", "aeo", "llms.txt", "llm-seo", "ai-search", "chatgpt", "claude", "perplexity", "citation-tracking", "white-hat", "agent", "schema.org", "sameAs"],
+  "author": "Desired Solutions (https://desiredsolutions.me)",
+  "license": "MIT",
+  "type": "module",
+  "homepage": "https://github.com/dnzengou/geo-agent#readme",
+  "bugs": { "url": "https://github.com/dnzengou/geo-agent/issues" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dnzengou/geo-agent.git"
+  },
+  "engines": { "node": ">=18" },
+  "bin": { "geo-agent": "./bin/geo-agent.mjs" },
+  "main": "./scripts/run.mjs",
+  "files": [
+    "bin/",
+    "scripts/",
+    "templates/",
+    "example.config.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "start": "node scripts/run.mjs",
+    "mine": "node scripts/mine-prompts.mjs",
+    "probe": "node scripts/probe-citations.mjs",
+    "entity": "node scripts/complete-entity-graph.mjs",
+    "test": "node scripts/smoke.mjs"
+  }
+}

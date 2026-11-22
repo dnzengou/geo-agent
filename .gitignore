@@ -1,0 +1,13 @@
+node_modules/
+dist/
+build/
+.env
+.env.*
+*.log
+.DS_Store
+
+# agent outputs — kept out of version control by default.
+# the human merges approved items into their agent-seo.config.json.
+proposals/
+reports/
+data/

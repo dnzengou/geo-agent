@@ -1,0 +1,19 @@
+{
+  "name": "Pulsecraft",
+  "url": "https://pulsecraft.app/",
+  "publisher": {
+    "name": "Pulsecraft",
+    "url": "https://pulsecraft.app",
+    "sameAs": [
+      "https://github.com/oduya/pulsecraft",
+      "https://mastodon.social/@pulsecraft"
+    ]
+  },
+  "supportExport": "./data/support.jsonl",
+  "probePrompts": [
+    "What's a free browser-based rhythm trainer for drummers?",
+    "A free metronome that works on iPhone without an app?",
+    "Where do I get drum patterns I can export as MIDI?"
+  ],
+  "notes": "Set OPENAI_API_KEY / ANTHROPIC_API_KEY / PERPLEXITY_API_KEY / GEMINI_API_KEY in env for the probe step. Use your OWN keys. The probe uses the official APIs — no spoofing, no inflated prompts."
+}
