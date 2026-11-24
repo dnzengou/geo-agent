@@ -43,10 +43,21 @@ for (const k of Object.keys(env)) {
   }
 }
 
-// probe + entity must succeed (write skeleton / local walk).
+// probe + entity must succeed with no drafter keys (entity warns and
+// writes a proposal with blank drafts; probe writes a skeleton).
 for (const cmd of ["probe", "entity"]) {
   const r = spawnSync("node", [bin, cmd, "geo-agent.config.json"], { encoding: "utf8", env });
   assert.equal(r.status, 0, `${cmd} failed:\n${r.stderr}`);
+}
+// entity must still produce a proposal file with the missing profiles enumerated.
+{
+  const proposals = await readdir(join(tmp, "proposals"));
+  const entityFile = proposals.find(f => f.startsWith("entity-"));
+  assert.ok(entityFile, "entity should write a proposal file");
+  const p = JSON.parse(await readFile(join(tmp, "proposals", entityFile), "utf8"));
+  assert.equal(p.kind, "entity-graph-proposal");
+  assert.ok(p.missing.length > 0, "missing profiles should be enumerated");
+  assert.ok(p.missing.every(m => typeof m.charLimit === "number"), "each missing profile has a char limit");
 }
 
 // mine without any drafter key MUST fail cleanly with a helpful error.
@@ -84,9 +95,22 @@ assert.equal(summary.lost, 1);
 assert.equal(summary.stillCited, 1);
 assert.ok(captured.some(line => /newly cited: *1/.test(line)), "diff should print newly-cited count");
 
+// 4. diff markdown rendering (captured via --out)
+{
+  const mdPath = join(tmp, "diff.md");
+  const r = spawnSync("node", [bin, "diff", "prev.json", "curr.json", "--markdown", `--out=${mdPath}`], { encoding: "utf8", env });
+  assert.equal(r.status, 0, `diff --markdown failed:\n${r.stderr}`);
+  const md = await readFile(mdPath, "utf8");
+  assert.match(md, /^# Pulsecraft — GEO citation diff/m);
+  assert.match(md, /Newly cited/);
+  assert.match(md, /Lost/);
+  assert.match(md, /openai/);
+}
+
 console.log("smoke: ok");
 console.log("  detectCitation unit tests: 5/5");
-console.log("  probe + entity: exit 0 with no keys");
+console.log("  probe + entity: exit 0 with no keys, proposal files written");
 console.log("  mine without drafter key: fails with helpful error");
 console.log(`  diff: delta=${summary.delta} newly=${summary.newlyCited} lost=${summary.lost} still=${summary.stillCited}`);
+console.log("  diff --markdown: rendered to file, title and sections present");
 await rm(tmp, { recursive: true, force: true });
