@@ -13,7 +13,7 @@ Zero runtime dependencies. One Node CLI. One config file. Three agents.
 | `geo-agent mine <config>` | Read a support-channel export; propose prompt-voice FAQ entries using any configured LLM. |
 | `geo-agent probe <config>` | Ask the major assistants a fixed set of prompts on a cadence; record citations. |
 | `geo-agent entity <config>` | Walk the `sameAs` graph; propose missing profile copy. |
-| `geo-agent diff <prev.json> <curr.json>` | Print the week-over-week citation delta between two probe reports. |
+| `geo-agent diff <prev.json> <curr.json> [--markdown [--out=diff.md]]` | Print or render-to-markdown the week-over-week citation delta between two probe reports. |
 | `geo-agent all <config>` | Run mine + probe + entity in order. |
 
 Every command writes a **proposal** or **report** under `./proposals/` or `./reports/`. Nothing ships to your live site. The human reads the proposal, approves the entries worth shipping, and merges them into the [`agent-seo.config.json`](https://github.com/dnzengou/agent-seo) their site is actually generated from.
@@ -140,13 +140,14 @@ Everything goes under two gitignored directories:
 
 ## Status
 
-**v0.0.3 — probe + mine + diff live.** The agent is now end-to-end usable for a weekly GEO cadence:
+**v0.0.4 — v1.0 agent surface complete.** All three agents and the diff command are live:
 
 - `probe` calls OpenAI, Anthropic, Perplexity and Gemini via native `fetch` (zero deps, Node 18+).
 - `mine` reads a support-channel export (CSV or JSONL) and drafts prompt-voice FAQ entries using any configured LLM — DeepSeek, Groq, Mistral, OpenAI, Anthropic, Gemini, OpenRouter, Together, Fireworks or a local Ollama. Cheapest available wins by default; override with `config.drafter`.
-- `diff` prints the week-over-week citation delta between two probe reports, no network.
+- `entity` walks the `sameAs` graph and drafts copy for every missing profile (GitHub, LinkedIn, X, Mastodon, Product Hunt, Crunchbase, Wikidata) with per-profile character caps, briefs, and a banned-marketing-language guardrail. Uses the same drafter resolver as `mine`.
+- `diff` prints the week-over-week citation delta — or renders to Markdown (`--markdown --out=diff.md`) for the weekly email.
 
-`entity` still writes a stub proposal; LLM drafting for the missing profile copy is the next commit series.
+Smoke tests cover all four commands end-to-end with every provider key scrubbed. Ship cadence: weekly `probe` → weekly `diff --markdown` → human reads, approves what's worth shipping, merges into `agent-seo.config.json`.
 
 See the walkthrough article: [*Agent SEO: the week a 400-user indie tool muscled its way into ChatGPT, Claude and Perplexity answers*](https://desiredsolutions.me/notes/agent-seo-the-week-an-indie-saas-got-cited).
 
