@@ -119,7 +119,9 @@ Everything goes under two gitignored directories:
 
 ## Status
 
-**v0.0.1 — scaffold.** The three commands are wired end-to-end with stubs that write the full file shapes to disk. Wiring to live LLM providers is the next commit series. The shape is stable; the writes are mock. Treat as a public draft.
+**v0.0.2 — probe is live.** The `probe` command now calls OpenAI, Anthropic, Perplexity and Gemini directly via native `fetch` (zero deps, Node 18+) using your own keys from env. Each response is scanned for a word-boundary match against your brand name; a short quote around every hit is captured. Weekly reports go under `./reports/citations-YYYY-MM-DD.json`.
+
+`mine` and `entity` are still stubs that write the full proposal shape — wiring them to live LLM drafting is next. The scaffold is public-draft stable.
 
 See the walkthrough article: [*Agent SEO: the week a 400-user indie tool muscled its way into ChatGPT, Claude and Perplexity answers*](https://desiredsolutions.me/notes/agent-seo-the-week-an-indie-saas-got-cited).
 
