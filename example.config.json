@@ -15,5 +15,7 @@
     "A free metronome that works on iPhone without an app?",
     "Where do I get drum patterns I can export as MIDI?"
   ],
-  "notes": "Set OPENAI_API_KEY / ANTHROPIC_API_KEY / PERPLEXITY_API_KEY / GEMINI_API_KEY in env for the probe step. Use your OWN keys. The probe uses the official APIs — no spoofing, no inflated prompts."
+  "drafter": null,
+  "models": {},
+  "notes": "LLM-agnostic. The probe calls OpenAI / Anthropic / Perplexity / Gemini by default — set any of OPENAI_API_KEY, ANTHROPIC_API_KEY, PERPLEXITY_API_KEY, GEMINI_API_KEY to enable each. The drafter (used by `mine`) picks the cheapest available LLM: DeepSeek, then Groq, Mistral, OpenRouter, Together, Fireworks, OpenAI, Anthropic, Gemini — or a local Ollama when OLLAMA_HOST is set. Override by setting `drafter` to a provider id and `models` per provider."
 }

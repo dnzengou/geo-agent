@@ -3,7 +3,7 @@
 // native fetch. No spoofing, no SDKs, no third-party server.
 import { writeFile, mkdir } from "node:fs/promises";
 import { dirname, join } from "node:path";
-import { PROVIDERS, detectCitation } from "./providers.mjs";
+import { PROVIDERS, callProvider, detectCitation } from "./providers.mjs";
 
 export async function probe(config) {
   const prompts = config.probePrompts || [];
@@ -37,7 +37,7 @@ export async function probe(config) {
       }
       const askedAt = new Date().toISOString();
       try {
-        const out = await provider.def.call(prompt, { model: provider.model, apiKey: provider.apiKey });
+        const out = await callProvider(provider.def, prompt, { model: provider.model, apiKey: provider.apiKey });
         const detection = detectCitation(out.text, brand);
         runs.push({
           provider: provider.id,
@@ -90,9 +90,13 @@ export async function probe(config) {
 
 function resolveProviders(config) {
   const picked = config.providers;
+  // Default probe set = the four mainstream assistants users ask questions of.
+  // The other providers (deepseek, groq, mistral, together, fireworks, openrouter,
+  // ollama) are configured to be drafters by default; add them to config.providers
+  // if you want to probe them too.
   const ids = Array.isArray(picked) && picked.length
     ? picked
-    : Object.keys(PROVIDERS);
+    : ["openai", "anthropic", "perplexity", "gemini"];
   return ids.map(id => {
     const def = PROVIDERS[id];
     if (!def) {
