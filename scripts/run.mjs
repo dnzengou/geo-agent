@@ -1,31 +1,42 @@
-// geo-agent entry. Dispatches to mine | probe | entity | all.
-// Every write-to-disk step produces a proposal JSON for human review.
+// geo-agent entry. Dispatches to mine | probe | entity | diff | all.
+// Every write-to-disk step produces a proposal or report for human review.
 // Nothing ships without the human approving the proposal.
 import { mine } from "./mine-prompts.mjs";
 import { probe } from "./probe-citations.mjs";
 import { completeEntityGraph } from "./complete-entity-graph.mjs";
+import { diff } from "./diff-reports.mjs";
 import { readFile } from "node:fs/promises";
 
 const USAGE = `
-geo-agent <command> [config.json]
+geo-agent <command> [args...]
 
 commands:
-  mine    read a support channel export and propose prompt-voice FAQ entries
-  probe   ask the major assistants a fixed set of prompts and record citations
-  entity  walk the sameAs graph and propose missing profile copy
-  all     run mine, probe, entity in order
+  mine   [config.json]                          propose prompt-voice FAQ entries from a support export (LLM-agnostic drafter)
+  probe  [config.json]                          ask OpenAI / Claude / Perplexity / Gemini a fixed set of prompts and record citations
+  entity [config.json]                          walk the sameAs graph and propose missing profile copy
+  diff   <prevReport.json> <currReport.json>    print the week-over-week citation delta between two probe reports
+  all    [config.json]                          run mine + probe + entity in order
 
-every command writes a proposal file under ./proposals/. Nothing ships
-until a human merges the proposal into agent-seo.config.json by hand
-or with:   geo-agent sign <proposal.json>
+drafter and probe providers come from env keys. Any one of these
+enables the drafter (cheap first): DEEPSEEK_API_KEY, OPENAI_API_KEY,
+ANTHROPIC_API_KEY, GEMINI_API_KEY, MISTRAL_API_KEY, GROQ_API_KEY,
+TOGETHER_API_KEY, FIREWORKS_API_KEY, OPENROUTER_API_KEY — or a
+running Ollama (http://127.0.0.1:11434).
+
+every command writes a proposal or report under ./proposals/ or ./reports/.
+nothing ships until a human merges approved items into agent-seo.config.json.
 `.trim();
 
 export async function run(argv) {
-  const [cmd = "", configPath = "geo-agent.config.json"] = argv;
+  const [cmd = "", ...rest] = argv;
   if (!cmd || cmd === "-h" || cmd === "--help") {
     console.log(USAGE);
     return;
   }
+  if (cmd === "diff") {
+    return diff(rest);
+  }
+  const configPath = rest[0] || "geo-agent.config.json";
   const config = await loadConfig(configPath);
   switch (cmd) {
     case "mine":   return mine(config);
